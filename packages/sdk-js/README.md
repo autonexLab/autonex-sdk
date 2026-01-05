@@ -1,6 +1,13 @@
 # @autonex/sdk-js
 
-Solana-native policy-gated, intent-based execution SDK.
+Solana-native intent-based execution and policy enforcement SDK for autonomous agents.
+
+This package provides:
+- Typed domain models (Agent, Intent, Policy, ExecutionReceipt)
+- Intent builders and signature validation
+- Policy builders and allowlist enforcement
+- Simulation-first execution (cannot be bypassed)
+- Deterministic receipt decoding and verification helpers
 
 ## Install
 
@@ -8,10 +15,19 @@ Solana-native policy-gated, intent-based execution SDK.
 npm i @autonex/sdk-js
 ```
 
-## Quickstart
+## Key security properties
+
+- No private key custody
+- Reject unsigned intents
+- Reject expired intents
+- Policy is required
+- Prevent arbitrary CPI targets via protocol allowlists
+- Execution always simulates first
+
+## Usage
 
 ```ts
-import { AutonexClient, IntentBuilder, PolicyBuilder } from "@autonex/sdk-js";
+import { AutonexClient } from "@autonex/sdk-js";
 import { PublicKey } from "@solana/web3.js";
 
 const client = new AutonexClient({
@@ -20,33 +36,40 @@ const client = new AutonexClient({
 });
 
 const agentId = new PublicKey("YourAgentPubkeyHere...");
+const allowedProgram = new PublicKey("So11111111111111111111111111111111111111112");
 
-const policy = new PolicyBuilder()
-  .maxTxAmount(1_000_000) // lamports
-  .dailyLimit(10_000_000)
-  .allowProtocols([new PublicKey("So11111111111111111111111111111111111111112")])
+const policy = client.policy
+  .build()
+  .allowProtocols([allowedProgram])
   .allowMethods(["swap"])
-  .maxSlippage(50) // bps
-  .timeWindow({ startHourUtc: 0, endHourUtc: 23 })
+  .maxSlippage(50)
   .build();
 
-const intent = new IntentBuilder(agentId)
+const intent = client.intent
+  .build(agentId)
   .swap({
-    targetProgram: new PublicKey("So11111111111111111111111111111111111111112"),
-    method: "swap",
-    params: { inMint: "...", outMint: "...", amountIn: "1000" },
+    targetProgram: allowedProgram,
+    params: { amountIn: "1000" },
     constraints: { maxSlippageBps: 50 },
     expirationUnixMs: Date.now() + 60_000
   })
   .withNonce("nonce-1")
   .build();
 
-// You must sign the intent using your own signer (SDK never stores keys)
+// Sign the canonical intent message using your signer.
 // intent.signature = ...
 
 const sim = await client.simulation.simulate(intent, policy);
 if (!sim.allowed) throw new Error(sim.reason);
 
-// Execution always re-simulates; skipping simulation is not possible.
-// const receipt = await client.execution.execute(intent, policy, { signer: walletAdapterSigner });
+// Execution always re-simulates.
+// const { signature } = await client.execution.execute(intent, policy, { signer });
+```
+
+## Dev
+
+```bash
+npm run typecheck
+npm run test
+npm run build
 ```

@@ -1,5 +1,24 @@
 # autonex-sdk-rust
 
-Rust types + deterministic serialization + validation for AUTONEX intents and policies.
+Solana-compatible Rust crate for AUTONEX SDK domain types, deterministic serialization, and validation.
 
-This crate is Solana-compatible and does not assume an async runtime.
+Focus:
+- Strong typing
+- Explicit error handling
+- Deterministic serialization (Borsh)
+- No async runtime assumptions
+
+## Modules
+- agent.rs
+- intent.rs
+- policy.rs
+- execution.rs
+- errors.rs
+- validation.rs
+
+## Dev
+
+```bash
+cargo check
+cargo test
+```
