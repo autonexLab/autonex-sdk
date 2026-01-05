@@ -82,6 +82,12 @@ out
 .nuxt
 dist
 
+# SDK build outputs (monorepo)
+packages/**/dist/
+
+# Rust
+**/target/
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js

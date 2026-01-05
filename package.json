@@ -1,0 +1,21 @@
+{
+  "name": "autonex-sdk",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AUTONEX SDK: Solana-native AI Agent Execution & Policy SDK (monorepo)",
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@11.6.2",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run -w @autonex/sdk-js build",
+    "typecheck": "npm run -w @autonex/sdk-js typecheck",
+    "lint": "npm run -w @autonex/sdk-js lint",
+    "build:rust": "cd packages/sdk-rust && cargo build",
+    "check:rust": "cd packages/sdk-rust && cargo check",
+    "test:rust": "cd packages/sdk-rust && cargo test"
+  }
+}

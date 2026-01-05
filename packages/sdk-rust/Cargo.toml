@@ -1,0 +1,19 @@
+[package]
+name = "autonex-sdk-rust"
+version = "0.1.0"
+edition = "2021"
+description = "AUTONEX Rust SDK (Solana-compatible types + validation)"
+license = "Apache-2.0"
+
+[lib]
+name = "autonex_sdk_rust"
+path = "src/lib.rs"
+
+[features]
+default = []
+
+[dependencies]
+solana-program = "~1.18"
+borsh = { version = "1.5", features = ["derive"] }
+sha2 = "0.10"
+thiserror = "1.0"
